@@ -87,8 +87,9 @@ fn read_encoder_press(input: u8, _state: u8) -> Result<DeviceInput, MirajazzErro
         0x35 | 0x41 => 1,
         0x33 | 0x42 => 2,
         0x36 | 0x43 => 3, // Right most
-        0x38 => 4,
-        0x39 => 5,
+        // Ignore swipe for now because they are unreliabe/detected incorrectly
+        // 0x38 => 4,
+        // 0x39 => 5,
         _ => return Err(MirajazzError::BadData),
     };
 

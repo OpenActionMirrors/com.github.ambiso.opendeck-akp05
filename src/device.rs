@@ -134,7 +134,7 @@ async fn device_events_task(candidate: &CandidateDevice) -> Result<(), MirajazzE
     log::info!("Reader is ready for {}", candidate.id);
 
     loop {
-        log::info!("Reading updates...");
+        log::debug!("Reading updates...");
 
         let updates = match reader.read(None).await {
             Ok(updates) => updates,
@@ -208,7 +208,7 @@ pub async fn handle_set_image(device: &Device, evt: SetImageEvent) -> Result<(),
     let is_encoder = evt.controller.as_deref() == Some("Encoder");
     match (evt.position, evt.image) {
         (Some(position), Some(image)) => {
-            log::info!("Setting image for button {}", position);
+            log::debug!("Setting image for button {}", position);
             let position = map_position(position, is_encoder)?;
 
             // OpenDeck sends image as a data url, so parse it using a library
