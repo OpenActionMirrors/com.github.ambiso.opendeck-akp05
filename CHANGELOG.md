@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.4] - 2025-12-09
+
+Fix name and icon
+
 ## [0.8.3] - 2025-12-09
 
 Fix id in justfile
