@@ -1,7 +1,10 @@
 use device::{handle_error, handle_set_image};
 use mirajazz::device::Device;
-use openaction::*;
-use std::{collections::HashMap, process::exit, sync::LazyLock};
+use openaction::{
+    OpenActionResult, async_trait,
+    global_events::{SetBrightnessEvent, SetImageEvent, set_global_event_handler},
+};
+use std::{collections::HashMap, sync::LazyLock};
 use tokio::sync::{Mutex, RwLock};
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
 use watcher::watcher_task;
@@ -21,11 +24,10 @@ pub static TOKENS: LazyLock<RwLock<HashMap<String, CancellationToken>>> =
 pub static TRACKER: LazyLock<Mutex<TaskTracker>> = LazyLock::new(|| Mutex::new(TaskTracker::new()));
 
 struct GlobalEventHandler {}
-impl openaction::GlobalEventHandler for GlobalEventHandler {
-    async fn plugin_ready(
-        &self,
-        _outbound: &mut openaction::OutboundEventManager,
-    ) -> EventHandlerResult {
+
+#[async_trait]
+impl openaction::global_events::GlobalEventHandler for GlobalEventHandler {
+    async fn plugin_ready(&self) -> OpenActionResult<()> {
         let tracker = TRACKER.lock().await.clone();
 
         let token = CancellationToken::new();
@@ -41,11 +43,7 @@ impl openaction::GlobalEventHandler for GlobalEventHandler {
         Ok(())
     }
 
-    async fn set_image(
-        &self,
-        event: SetImageEvent,
-        _outbound: &mut OutboundEventManager,
-    ) -> EventHandlerResult {
+    async fn device_plugin_set_image(&self, event: SetImageEvent) -> OpenActionResult<()> {
         log::debug!("Asked to set image");
         log::trace!("Set image event: {:#?}", event);
 
@@ -63,11 +61,10 @@ impl openaction::GlobalEventHandler for GlobalEventHandler {
         Ok(())
     }
 
-    async fn set_brightness(
+    async fn device_plugin_set_brightness(
         &self,
         event: SetBrightnessEvent,
-        _outbound: &mut OutboundEventManager,
-    ) -> EventHandlerResult {
+    ) -> OpenActionResult<()> {
         log::debug!("Asked to set brightness: {:#?}", event);
 
         let id = event.device.clone();
@@ -86,9 +83,6 @@ impl openaction::GlobalEventHandler for GlobalEventHandler {
     }
 }
 
-struct ActionEventHandler {}
-impl openaction::ActionEventHandler for ActionEventHandler {}
-
 async fn shutdown() {
     let tokens = TOKENS.write().await;
 
@@ -97,11 +91,11 @@ async fn shutdown() {
     }
 }
 
+static GLOBAL_EVENT_HANDLER: GlobalEventHandler = GlobalEventHandler {};
+
 async fn connect() {
-    if let Err(error) = init_plugin(GlobalEventHandler {}, ActionEventHandler {}).await {
-        log::error!("Failed to initialize plugin: {}", error);
-        exit(1);
-    }
+    set_global_event_handler(&GLOBAL_EVENT_HANDLER);
+    openaction::run(std::env::args().collect()).await;
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
