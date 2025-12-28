@@ -84,7 +84,10 @@ impl Kind {
     /// Returns protocol version for device
     pub fn protocol_version(&self) -> usize {
         match self {
-            Self::N4EN | Self::Akp05E | Self::N4Pro | Self::MsdPro => 3,
+            Self::N4EN => 3,
+            Self::Akp05E => 3,
+            Self::N4Pro => 3,
+            Self::MsdPro => 3,
         }
     }
 
