@@ -36,8 +36,7 @@ pub const MSD_PRO_PID: u16 = 0x1003;
 pub const AKP05E_QUERY: DeviceQuery = DeviceQuery::new(65440, 1, AJAZZ_VID, AKP05E_PID);
 pub const N4EN_QUERY: DeviceQuery = DeviceQuery::new(65440, 1, MIRABOX_VID, N4EN_PID);
 pub const N4_PRO_QUERY: DeviceQuery = DeviceQuery::new(65440, 1, VSDINSIDE_VID, N4_PRO_PID);
-pub const MSD_PRO_QUERY: DeviceQuery =
-    DeviceQuery::new(65440, 1, MARS_GAMING_VID, MSD_PRO_PID);
+pub const MSD_PRO_QUERY: DeviceQuery = DeviceQuery::new(65440, 1, MARS_GAMING_VID, MSD_PRO_PID);
 
 pub const QUERIES: &[DeviceQuery] = &[AKP05E_QUERY, N4EN_QUERY, N4_PRO_QUERY, MSD_PRO_QUERY];
 
